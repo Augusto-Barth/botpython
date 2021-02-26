@@ -12,14 +12,16 @@ btoken = os.getenv('token')
 prefix = os.getenv('prefix')
 response_object = links
 
-client = discord.Client()
+intents = discord.Intents.all()
+intents.members = True
+client = discord.Client(intents=intents)
 
 
 @client.event
 async def on_ready():
     print('Conectado como {0.user}'.format(client))
     await client.change_presence(activity=discord.Game('"!comandos" para ajuda'))
-    # print('Bot foi iniciado, com {0} usuários, em {1} canais de {2} servers.' .format(client.user.size, client.channels.size, client.guilds.size))
+    print('Bot foi iniciado, com {} usuários, em {} servers.' .format(len(client.users), len(client.guilds)))
 
 
 @client.event
