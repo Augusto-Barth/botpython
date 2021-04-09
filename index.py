@@ -1,6 +1,5 @@
 import os
 import discord
-from dotenv import load_dotenv
 import json
 import random
 # from dict import comandos
@@ -10,10 +9,20 @@ data = open('links.json', "r")
 links = json.load(data)
 
 # importando o .env, para utilizar o token do bot e a lista de comandos simples
-load_dotenv()
-btoken = os.getenv('token')
-prefix = os.getenv('prefix')
+# não uso mais .env porque e mais facil utilizar json
+# load_dotenv()
+# btoken = os.getenv('token')
+# prefix = os.getenv('prefix')
+
+# importando o token por um json
+conf = open('config.json', "r")
+confs = json.load(conf)
+btoken = confs['token']
+
 response_object = links
+
+# colocando o prefixo no próprio arquivo, porque eu nao sei mexer no git
+prefix = '!'
 
 # pemitindo o bot ver outras pessoas, e mais algumas coisas da API que eu com certeza entendo
 intents = discord.Intents.all()
@@ -21,7 +30,7 @@ intents.members = True
 client = discord.Client(intents=intents)
 
 
-# função para tratar o input dos comandos, separando o prefixo dos comandos e dos argumentos(caso haja algum)
+# funcao para tratar o input dos comandos, separando o prefixo dos comandos e dos argumentos(caso haja algum)
 def trata_argumentos(message):
     args = message.content[len(prefix):]
     args2 = args.strip().split()
@@ -44,7 +53,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # pequena função anônima para encurtar a mesma função de sempre
+    # pequena funcao anônima para encurtar a mesma funcao de sempre
     manda = lambda mens: message.channel.send('{}'.format(mens))
 
     if message.content.startswith(prefix):
