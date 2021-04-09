@@ -1,0 +1,8 @@
+.env
+.cpp
+config.json
+venv
+__pycache__
+.vscode
+.idea
+extras
