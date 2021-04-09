@@ -1,17 +1,22 @@
 import os
 import discord
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import json
 import random
-from dict import comandos
+# from dict import comandos
 # importar token de config.json, mas agora uso .env
 
 data = open('links.json', "r")
 links = json.load(data)
+
+conf = open('config.json', "r")
+confs = json.load(conf)
+btoken = confs['token']
+prefix = confs['prefix']
 # importando o .env, para utilizar o token do bot e a lista de comandos simples
-load_dotenv()
-btoken = os.getenv('token')
-prefix = os.getenv('prefix')
+# load_dotenv()
+# btoken = os.getenv('token')
+# prefix = os.getenv('prefix')
 response_object = links
 # pemitindo o bot ver outras pessoas, e mais algumas coisas da API que eu com certeza entendo
 intents = discord.Intents.all()
