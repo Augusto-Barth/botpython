@@ -28,6 +28,12 @@ intents = discord.Intents.all()
 intents.members = True
 client = discord.Client(intents=intents)
 
+# lista de jogos para a roleta game
+games = ['Lolzin', 'Cszin', 'Stardew Valley', 'Outro']
+
+# pepemonkas = [emoji for emoji in client.emojis if client.emoji.name == "pepemonkas"]
+pepemonkas = '<:pepemonkas:622174234352812052>'
+
 
 # funcao para tratar o input dos comandos, separando o prefixo dos comandos e dos argumentos(caso haja algum)
 def trata_argumentos(message):
@@ -59,20 +65,48 @@ async def on_message(message):
         comando, argumentos = trata_argumentos(message)
 
         if comando == 'ping':
-            await manda(comando)
+            pingm = await manda('Ping?')
+            await pingm.edit(content = 'Pong! Latência de {0} ms. Latência de API {1} ms'.format(str(pingm.created_at - message.created_at)[8:-3], round(client.latency*1000)))
 
-        elif comando == 'roleta':
+        elif comando == 'roleta' and argumentos == "":
             n = random.randint(0, 1)
             if n == 0:
                 await manda('Morreu!')
             else:
                 await manda('Sobreviveu!')
 
+        elif comando == 'roleta' and argumentos == "role":
+            n = random.randint(0, 4)
+            if n == 0:
+                await manda('Top!')
+            elif n == 1:
+                await manda('Jungle!')
+            elif n == 2:
+                await manda('Mid!')
+            elif n == 3:
+                await manda('Adc!')
+            elif n == 4:
+                await manda('Sup!')    
+        
+        elif comando == 'roleta' and argumentos == "game":
+            n = random.randrange(0, len(games))
+            await manda(games[n]+'!')
+
+        elif comando == 'games' and argumentos == '':
+            listaGames = ''
+            for i in games:
+                listaGames = listaGames + i
+                listaGames = listaGames + ", "
+            await manda(listaGames[:-2])
+            
     if message.content in response_object:
         await manda(response_object[message.content])
 
     if ';-;' in message.content:
         await manda(';-;')
+    
+    if f'pepemonkas' in message.content:
+        await manda(f'{pepemonkas}')
 
 client.run(btoken)
 
