@@ -86,7 +86,7 @@ async def on_message(message):
             elif n == 3:
                 await manda('Adc!')
             elif n == 4:
-                await manda('Sup!')    
+                await manda('Sup!')
         
         elif comando == 'roleta' and argumentos == "game":
             n = random.randrange(0, len(games))
