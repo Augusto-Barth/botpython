@@ -14,9 +14,9 @@ links = json.load(data)
 # prefix = os.getenv('prefix')
 
 # importando o token por um json
-conf = open('config.json', "r")
-confs = json.load(conf)
-btoken = confs['token']
+with open('config.json', 'r') as conf:
+    confs = json.load(conf)
+    btoken = confs['token']
 
 response_object = links
 
@@ -29,27 +29,35 @@ intents.members = True
 client = discord.Client(intents=intents)
 
 # lista de jogos para a roleta game
-games = ['Lolzin', 'Cszin', 'Stardew Valley', 'Outro']
+# agora uso um arquivo separado com a lista de jogos
+# games = ['Lolzin', 'Cszin', 'Stardew Valley', 'Outro']
 
 # pepemonkas = [emoji for emoji in client.emojis if client.emoji.name == "pepemonkas"]
 pepemonkas = '<:pepemonkas:622174234352812052>'
 
 
+canaisNS = [442099014167429130, 509433222975717397, 821890079626493972]
+
 # funcao para tratar o input dos comandos, separando o prefixo dos comandos e dos argumentos(caso haja algum)
-def trata_argumentos(message):
+def trata_argumentos(message, raw):
     args = message.content[len(prefix):]
     args2 = args.strip().split()
-    argumentoslist = str(args2[1:]).lower()
+
+    if raw:
+        argumentoslist = str(args2[1:])
+    else:
+        argumentoslist = str(args2[1:]).lower()
+
     comandolist = str(args2[:1]).lower()
     comando = "".join(str(x) for x in comandolist)[2:len(comandolist) - 2]
-    argumentos = "".join(str(x) for x in argumentoslist)[2:len(argumentoslist) - 2]
+    argumentos = "".join(str(x) for x in argumentoslist)[2:len(argumentoslist) - 2].replace("\'", "").replace(",", "")
     return comando, argumentos
-
 
 @client.event
 async def on_ready():
     print('Conectado como {0.user}'.format(client))
     await client.change_presence(activity=discord.Game('"!comandos" para ajuda'))
+    # await client.change_presence(status=discord.Status.offline)
     print('Bot foi iniciado, com {} usuários, em {} servers.' .format(len(client.users), len(client.guilds)))
 
 
@@ -59,10 +67,10 @@ async def on_message(message):
         return
 
     # pequena funcao anônima para encurtar a mesma funcao de sempre
-    manda = lambda mens: message.channel.send('{}'.format(mens))
+    manda = lambda mens: message.channel.send(f'{mens}')
 
     if message.content.startswith(prefix):
-        comando, argumentos = trata_argumentos(message)
+        comando, argumentos = trata_argumentos(message, 0)
 
         if comando == 'ping':
             pingm = await manda('Ping?')
@@ -93,11 +101,45 @@ async def on_message(message):
             await manda(games[n]+'!')
 
         elif comando == 'games' and argumentos == '':
-            listaGames = ''
-            for i in games:
-                listaGames = listaGames + i
-                listaGames = listaGames + ", "
-            await manda(listaGames[:-2])
+            listaGames = ""
+            jogos = open("jogos", "r")
+            for jogo in jogos:
+                listaGames = listaGames + jogo
+                # listaGames = listaGames + ", "
+            # await manda(listaGames)
+            
+            embedVar = discord.Embed(
+                title="Jogos", description=listaGames, color=0x00ff00)
+            jojos = await message.channel.send(embed=embedVar)
+            await message.delete()
+            await jojos.delete(delay=15)
+
+
+            jogos.close()
+
+        elif comando == 'add':
+            comando, argumentos = trata_argumentos(message, 1)
+
+            jogoAtual = ''.join(argumentos)
+            with open("jogos", "a") as f:
+                f.write(f"{jogoAtual}\n")
+                f.close()
+            await message.delete()
+
+        elif comando == 'rem':
+            comando, argumentos = trata_argumentos(message, 1)
+
+            with open("jogos", "r") as f:
+                linhas = f.readlines()
+            if argumentos:
+                del linhas[int(argumentos)+1]
+            else:
+                del linhas[-1]
+            
+            with open("jogos", "w") as f:
+                for linha in linhas:
+                    f.write(linha)
+            await message.delete()
             
     if message.content in response_object:
         await manda(response_object[message.content])
@@ -107,6 +149,12 @@ async def on_message(message):
     
     if f'pepemonkas' in message.content:
         await manda(f'{pepemonkas}')
+
+    if message.channel.id not in canaisNS:
+        for attachment in message.attachments:
+            if 'image' in attachment.content_type:
+                await manda('.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.')
+                break
 
 client.run(btoken)
 
